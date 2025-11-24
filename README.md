@@ -42,8 +42,6 @@ Each section contains ready-to-use scripts, test cases, and short usage notes.
 
 ## 🧬 3.1 Generating Diverse Complex Models with AlphaFold
 
-(*based on Section 3.1 of the chapter* )
-
 This folder contains:
 
 * Workflows for **AlphaFold2-Multimer** (versions v1, v2, v3) with:
@@ -61,8 +59,6 @@ The aim is to generate **>100 structural models per complex**, which is essentia
 ---
 
 ## ⚡ 3.3.2 pyDock Energy Scoring
-
-(*based on Section 3.3* )
 
 This folder includes:
 
@@ -83,7 +79,6 @@ The **VHH–RNase A (PDB 4POU)** complex is provided as an illustrative example.
 
 ## 🔗 3.4. Integrating AlphaFold Confidence and pyDock Energies
 
-This section implements the key idea of the chapter:
 **combining AlphaFold model confidence (AF-MC = 0.8·ipTM + 0.2·pTM) with pyDock energies using z-score normalization.**
 
 Included:
@@ -106,8 +101,6 @@ When **AF-MC < 0.8**, the pipeline automatically falls back to **classical pyDoc
 ---#
 
 ## 📘 Case Studies Included
-
-Reproductions of the three benchmark cases analyzed in the chapter:#
 
 1. **VHH–RNase A (4POU)**
    → AF2 rank 1 fails; pyDock identifies an acceptable model.
