@@ -97,8 +97,9 @@ Included:
 * Final ranking and filtering of top predictions.
 
 When **AF-MC < 0.8**, the pipeline automatically falls back to **classical pyDock docking**, following the decision tree shown in Fig. 1 of the chapter.
-
----#
+<p align="center">
+  <img src="Fig.1_Scheme.png" alt="Fig.1_Scheme.png" width="600"/>
+</p>
 
 ## 📘 Case Studies Included
 
