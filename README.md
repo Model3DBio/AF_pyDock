@@ -83,8 +83,6 @@ The **VHH–RNase A (PDB 4POU)** complex is provided as an illustrative example.
 
 ## 🔗 3.4. Integrating AlphaFold Confidence and pyDock Energies
 
-(*based on Section 3.4* )
-
 This section implements the key idea of the chapter:
 **combining AlphaFold model confidence (AF-MC = 0.8·ipTM + 0.2·pTM) with pyDock energies using z-score normalization.**
 
@@ -105,21 +103,14 @@ Included:
 
 When **AF-MC < 0.8**, the pipeline automatically falls back to **classical pyDock docking**, following the decision tree shown in Fig. 1 of the chapter.
 
----
+---#
 
-## 📘 Case Studies Included (optional, depending on your repo)
+## 📘 Case Studies Included
 
-Reproductions of the three benchmark cases analyzed in the chapter:
+Reproductions of the three benchmark cases analyzed in the chapter:#
 
 1. **VHH–RNase A (4POU)**
    → AF2 rank 1 fails; pyDock identifies an acceptable model.
-
-2. **Fab–cytochrome c (1WEJ)**
-   → AF3 rank 1 fails; pyDock identifies the correct solution.
-
-3. **Fab–Der p 1 allergen (5VPG)**
-   → AF3 fails entirely; classical pyDock docking provides a medium-quality model.
-
 ---
 
 ## 🛠 Requirements
@@ -135,8 +126,8 @@ Reproductions of the three benchmark cases analyzed in the chapter:
 ## 🚀 Quick Installation
 
 ```bash
-git clone https://github.com/<USER>/<REPO>.git
-cd <REPO>
+git clone https://github.com/PyDock/AF_pyDock/
+cd AF_pyDock
 ```
 
 Each internal folder includes its own usage notes and example scripts.
