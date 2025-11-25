@@ -163,4 +163,4 @@ Contributions, suggestions, and pull requests are welcome.
 
 For questions related to the protocol or pyDock software:
 
-**Juan Fernández-Recio Group**
+**[Juan Fernández-Recio Group](https://model3dbio.csic.es/)**
