@@ -101,6 +101,20 @@ When **AF-MC < 0.8**, the pipeline automatically falls back to **classical pyDoc
   <img src="Fig.1_Scheme.png" alt="Fig.1_Scheme.png" width="600"/>
 </p>
 
+In this repository, **only the components highlighted in the red box of the figure are implemented**, namely:
+
+* Generation of AlphaFold2-Multimer models using **ColabFold** (optional use AlphaFold3 server)
+* Extraction of **ipTM** and **pTM**
+* Computation of **Model Confidence (AF-MC)**
+* Calculation of **pyDock energy scoring** for AF2-generated complexes
+
+The remaining module—**the docking stage starting from monomeric or unbound structures**—is **not included** here.
+If docking poses are needed, they can be generated via the **pyDockWEB server**:
+
+👉 [https://life.bsc.es/pid/pydockweb](https://life.bsc.es/pid/pydockweb)
+
+---
+
 ## 📘 Case Studies Included
 
 1. **VHH–RNase A (4POU)**
