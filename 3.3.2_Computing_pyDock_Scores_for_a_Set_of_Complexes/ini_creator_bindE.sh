@@ -1,9 +1,9 @@
 #!/bin/bash
 # Case ID
 export CASE="${CASE:-4POU}"
-export PYDOCK="/usr/local/software/pyDock3/"
+export PYDOCK="${PYDOCK:-/usr/local/software/pyDock3/}"
 export GREASY="${GREASY:-/path/to/software/greasy/}"
-export GREASY_NWORKERS=8
+export GREASY_NWORKERS=${GREASY_NWORKERS:-8}
 CHAINS_REC_LIG_VALUES=("A B")
 
 cd ${CASE}/AF2/ || exit
@@ -42,4 +42,3 @@ EOF
 
     cd - || exit
 done
-
