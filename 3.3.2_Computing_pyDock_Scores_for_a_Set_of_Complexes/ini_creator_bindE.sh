@@ -4,7 +4,7 @@ export CASE="${CASE:-4POU}"
 export PYDOCK="${PYDOCK:-/usr/local/software/pyDock3/}"
 export GREASY="${GREASY:-/path/to/software/greasy/}"
 export GREASY_NWORKERS=${GREASY_NWORKERS:-8}
-CHAINS_REC_LIG_VALUES=("A B")
+export CHAINS_REC_LIG_VALUES=${CHAINS_REC_LIG_VALUES:-"A B"}
 
 cd ${CASE}/AF2/ || exit
 
