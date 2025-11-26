@@ -42,3 +42,4 @@ EOF
 
     cd - || exit
 done
+${GREASY}/greasy Greasy_BindE_mul_ligs.txt
