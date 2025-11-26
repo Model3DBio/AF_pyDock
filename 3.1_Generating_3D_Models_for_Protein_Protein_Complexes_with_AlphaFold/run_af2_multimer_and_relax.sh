@@ -39,7 +39,7 @@ for f in $(find -name "*_*\.r*[0-9].pdb"); do
 done > "${CASE}.colabfold.relax.greasy"
 
 # Number of simultaneous GPU relaxation jobs
-export GREASY_NWORKERS=4
+export GREASY_NWORKERS=${GREASY_NWORKER:-4}
 
 # Run Greasy
 "$GREASY/greasy" "${CASE}.colabfold.relax.greasy"
