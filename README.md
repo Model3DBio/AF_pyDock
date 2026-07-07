@@ -1,4 +1,3 @@
-# ⚠️ This repository is currently undergoing refactoring. Please wait a few days before using it.
 # Integrating AlphaFold and pyDock for Protein–Protein Complex Modeling
 
 This repository accompanies the chapter
@@ -12,7 +11,13 @@ The main goal is to demonstrate how **artificial intelligence–based modeling (
 * weak or transient interactions
 * highly flexible proteins
 
-The repository is organized into **three folders**, each corresponding to a major stage of the workflow: model generation with AlphaFold, energy scoring with pyDock, and final integration of both approaches.
+Repository organization
+
+This repository does **not** cover the installation of **ColabFold** or **AlphaFold 3 (AF3)**. For detailed installation instructions and a complete description of the workflow, please refer to the book chapter: [**Modeling Protein–Protein Complexes by Combining pyDock and AlphaFold**](https://doi.org/10.1007/978-1-0716-4828-5_15), published in *Methods in Molecular Biology* (2026).
+
+For the latest **AlphaFold 3 installation instructions**, please refer to the following repository: [AlphaFold3-Conda-Install](https://github.com/Model3DBio/AlphaFold3-Conda-Install).
+
+The repository is organized into three main folders, each corresponding to a major stage of the workflow:
 
 ---
 
