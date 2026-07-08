@@ -1,10 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-###############################################################################
 # CASE INPUTS
-###############################################################################
-
 # Case ID
 export CASE="${CASE:-4POU}"
 
@@ -20,13 +17,10 @@ export SEQ="${SEQ:-QVQLVESGGGLVQAGGSLRLSCAASGYPHPYLHMGWFRQAPGKEREGVAAMDSGGGGTLYA
 # Use one seed or several comma-separated seeds.
 export MODEL_SEEDS="${MODEL_SEEDS:-13441}"
 
-###############################################################################
 # SOFTWARE AND PATHS
-###############################################################################
-
 APPDIR="${APPDIR:-/home/user/Programs}"
 ALPHAFOLD3DIR="${ALPHAFOLD3DIR:-${APPDIR}/alphafold3}"
-
+CIF_TO_PDB="${CIF_TO_PDB:-/home/user/Programs/cif_to_pdb.py}"
 # HMMER binaries.
 # Default assumes HMMER was installed in the active conda environment.
 # To use system binaries, run for example:
@@ -42,10 +36,7 @@ RUN_AF3="${RUN_AF3:-run_alphafold.py}"
 # AlphaFold 3 buckets
 BUCKETS="${BUCKETS:-256,512,768,1024,1280,1536,2048,2560,3072,3584,4096,4608,5120}"
 
-###############################################################################
 # WORKING DIRECTORIES
-###############################################################################
-
 WORK_DIR="$(pwd)"
 CASE_DIR="${WORK_DIR}/${CASE}/AF3"
 JSON_FILE="${CASE_DIR}/${CASE}.json"
@@ -55,10 +46,7 @@ LOG_FILE="${OUTPUT_DIR}/af3_run.log"
 mkdir -p "${CASE_DIR}"
 mkdir -p "${OUTPUT_DIR}"
 
-###############################################################################
 # BASIC CHECKS
-###############################################################################
-
 if [[ -z "${SEQ}" ]]; then
     echo "ERROR: SEQ is empty." >&2
     exit 1
@@ -87,10 +75,7 @@ if [[ ! -d "${MODEL_DIR}" ]]; then
     exit 1
 fi
 
-###############################################################################
 # GENERATE ALPHAFOLD 3 JSON INPUT
-###############################################################################
-
 python - <<PY
 import json
 import re
@@ -168,10 +153,7 @@ print(f"Chain IDs: {', '.join(chr(ord('A') + i) for i in range(len(sequences)))}
 print(f"Number of model seeds: {len(model_seeds)}")
 PY
 
-###############################################################################
 # RUN ALPHAFOLD 3
-###############################################################################
-
 echo "Running AlphaFold 3..."
 echo "CASE:       ${CASE}"
 echo "JSON_FILE:  ${JSON_FILE}"
@@ -193,3 +175,7 @@ echo "LOG_FILE:   ${LOG_FILE}"
 
 echo "AlphaFold 3 finished."
 echo "Results directory: ${OUTPUT_DIR}"
+
+# CONVERT CIF TO PDB
+echo "Converting CIF to PDB files"
+for cif in ${OUTPUT_DIR}/${CASE}/seed-*/*cif ;do echo $CIF_TO_PDB ${cif} ${cif/.cif/.pdb};done
