@@ -60,6 +60,9 @@ This folder contains:
 * AlphaFold3 examples (server-based and local execution), including CIF-to-PDB conversion.
 * FASTA templates for heterodimers and homooligomers.
 
+The main helper scripts are `run_alphafold2_multimer.sh`,
+`relax_alphafold2_models.sh`, `run_alphafold3.sh`, and `cif_to_pdb.py`.
+
 The aim is to generate **>100 structural models per complex**, which is essential for the subsequent scoring stage.
 
 ---

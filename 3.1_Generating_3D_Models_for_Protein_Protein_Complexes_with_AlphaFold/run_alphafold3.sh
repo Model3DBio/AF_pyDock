@@ -20,9 +20,10 @@ export SEQ="${SEQ:-QVQLVESGGGLVQAGGSLRLSCAASGYPHPYLHMGWFRQAPGKEREGVAAMDSGGGGTLYA
 export MODEL_SEEDS="${MODEL_SEEDS:-13441}"
 
 # SOFTWARE AND PATHS
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APPDIR="${APPDIR:-/home/user/Programs}"
 ALPHAFOLD3DIR="${ALPHAFOLD3DIR:-${APPDIR}/alphafold3}"
-CIF_TO_PDB="${CIF_TO_PDB:-/home/user/Programs/cif_to_pdb.py}"
+CIF_TO_PDB="${CIF_TO_PDB:-${SCRIPT_DIR}/cif_to_pdb.py}"
 # HMMER binaries.
 # Default assumes HMMER was installed in the active conda environment.
 # To use system binaries, run for example:
@@ -180,4 +181,7 @@ echo "Results directory: ${OUTPUT_DIR}"
 
 # CONVERT CIF TO PDB
 echo "Converting CIF to PDB files"
-for cif in ${OUTPUT_DIR}/${CASE}/seed-*/*cif ;do $CIF_TO_PDB ${cif} ${cif/.cif/.pdb};done
+for cif in "${OUTPUT_DIR}/${CASE}"/seed-*/*cif; do
+    [[ -e "${cif}" ]] || continue
+    "${CIF_TO_PDB}" "${cif}" "${cif/.cif/.pdb}"
+done
