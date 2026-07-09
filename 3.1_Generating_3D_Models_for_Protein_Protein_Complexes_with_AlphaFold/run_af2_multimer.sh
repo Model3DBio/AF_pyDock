@@ -6,9 +6,6 @@ export CASE="${CASE:-4POU}"
 # Sequence
 export SEQ="${SEQ:-QVQLVESGGGLVQAGGSLRLSCAASGYPHPYLHMGWFRQAPGKEREGVAAMDSGGGGTLYADSVKGRFTISRDKGKNTVYLQMDSLKPEDTATYYCAAGGYQLRDRTYGHWGQGTQVTVSS:KETAAAKFERQHMDSSTSAASSSNYCNQMMKSRNLTKDRCKPVNTFVHESLADVQAVCSQKNVACKNGQTNCYQSYSTMSITDCRETGSSKYPNCAYKTTQANKHIIVACEGNPYVPVHFDASV}"
 
-# Greasy executable path
-export GREASY="${GREASY:-/path/to/software/greasy/}"
-
 mkdir -p "${CASE}/AF2/"
 
 # Create FASTA file (60 chars per line)
@@ -26,20 +23,6 @@ for h in v1 v2 v3; do
             --re-cycle-early-stop-tolerance 0 \
             --rank multimer \
             --use-dropout \
-            --num-recycle 20 \
-            --amber \
-            --use-gpu-relax
+            --num-recycle 20
     done
 done
-
-# Generate relaxation job list
-for f in $(find -name "*_*\.r*[0-9].pdb"); do
-    echo "colabfold_relax --max-iterations 2000 --tolerance 2.39 \
---stiffness 10.0 --max-outer-iterations 3 --use-gpu $f ${f/unrelaxed/relaxed}"
-done > "${CASE}.colabfold.relax.greasy"
-
-# Number of simultaneous GPU relaxation jobs
-export GREASY_NWORKERS=${GREASY_NWORKERS:-4}
-
-# Run Greasy
-"$GREASY/greasy" "${CASE}.colabfold.relax.greasy"
