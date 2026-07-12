@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+# REPOSITORY PATHS
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+CASE_STUDIES_DIR="${REPO_ROOT}/Case_Studies_Included"
+
 # Optional case selector. If empty, all Case_Studies_Included/*/AF2 folders are used.
 CASE="${CASE:-}"
 
@@ -8,7 +13,15 @@ CASE="${CASE:-}"
 INPUT_DIR="${INPUT_DIR:-}"
 
 # Base directory used when INPUT_DIR is not set.
-INPUT_ROOT="${INPUT_ROOT:-Case_Studies_Included}"
+INPUT_ROOT="${INPUT_ROOT:-${CASE_STUDIES_DIR}}"
+
+if [[ -n "${INPUT_DIR}" && "${INPUT_DIR}" != /* ]]; then
+    INPUT_DIR="${REPO_ROOT}/${INPUT_DIR}"
+fi
+
+if [[ "${INPUT_ROOT}" != /* ]]; then
+    INPUT_ROOT="${REPO_ROOT}/${INPUT_ROOT}"
+fi
 
 # By default, relax unrelaxed AF2 PDB files and skip outputs that already exist.
 PDB_PATTERN="${PDB_PATTERN:-*_unrelaxed_*.pdb}"
@@ -18,7 +31,11 @@ OVERWRITE="${OVERWRITE:-0}"
 GREASY="${GREASY:-/path/to/software/greasy/}"
 GREASY_NWORKERS="${GREASY_NWORKERS:-4}"
 RUN_GREASY="${RUN_GREASY:-1}"
-JOB_FILE="${JOB_FILE:-${CASE:-case_studies}.af2_relax.greasy}"
+JOB_FILE="${JOB_FILE:-${SCRIPT_DIR}/${CASE:-case_studies}.af2_relax.greasy}"
+
+if [[ "${JOB_FILE}" != /* ]]; then
+    JOB_FILE="${SCRIPT_DIR}/${JOB_FILE}"
+fi
 
 input_dirs=()
 
