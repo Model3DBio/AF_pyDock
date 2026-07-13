@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Adapted from Yoshitaka Moriwaki's LocalColabFold Linux installer:
+# https://github.com/YoshitakaMo/localcolabfold
+# Original work copyright (c) 2021 Yoshitaka Moriwaki and licensed under MIT.
+# The upstream license notice is preserved in LOCALCOLABFOLD_LICENSE.
+
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
