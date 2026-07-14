@@ -26,11 +26,12 @@ CASE_STUDIES_DIR="${REPO_ROOT}/Case_Studies_Included"
 APPDIR="${APPDIR:-/home/user/Programs}"
 ALPHAFOLD3DIR="${ALPHAFOLD3DIR:-${APPDIR}/alphafold3}"
 CIF_TO_PDB="${CIF_TO_PDB:-${SCRIPT_DIR}/cif_to_pdb.py}"
+AF3_CONDA_ENV="${AF3_CONDA_ENV:-Alphafold3}"
 # HMMER binaries.
-# Default assumes HMMER was installed in the active conda environment.
+# If HMMER3_BINDIR is not set, use the active conda environment or PATH.
 # To use system binaries, run for example:
-#   HMMER3_BINDIR=/usr/bin ./run_af3_case.sh
-HMMER3_BINDIR="${HMMER3_BINDIR:-${CONDA_PREFIX:-}/bin}"
+#   HMMER3_BINDIR=/usr/bin ./run_alphafold3.sh
+HMMER3_BINDIR="${HMMER3_BINDIR:-}"
 
 DB_DIR="${DB_DIR:-${ALPHAFOLD3DIR}/public_databases}"
 MODEL_DIR="${MODEL_DIR:-${ALPHAFOLD3DIR}/models}"
@@ -48,24 +49,73 @@ JSON_FILE="${CASE_DIR}/${CASE}.json"
 OUTPUT_DIR="${CASE_DIR}/output"
 LOG_FILE="${OUTPUT_DIR}/af3_run.log"
 
-mkdir -p "${CASE_DIR}"
-mkdir -p "${OUTPUT_DIR}"
-
 # BASIC CHECKS
 if [[ -z "${SEQ}" ]]; then
     echo "ERROR: SEQ is empty." >&2
     exit 1
 fi
 
-if [[ -z "${HMMER3_BINDIR}" || ! -d "${HMMER3_BINDIR}" ]]; then
-    echo "ERROR: HMMER3_BINDIR does not exist or is empty: ${HMMER3_BINDIR}" >&2
-    echo "Activate the conda environment or define HMMER3_BINDIR manually." >&2
+ACTIVE_CONDA_ENV="${CONDA_DEFAULT_ENV:-}"
+
+if RUN_AF3_PATH="$(command -v "${RUN_AF3}" 2>/dev/null)"; then
+    if [[ "${ACTIVE_CONDA_ENV}" == "${AF3_CONDA_ENV}" ]]; then
+        echo "INFO: expected Conda environment is active: ${AF3_CONDA_ENV}"
+    else
+        echo "WARNING: Conda environment '${AF3_CONDA_ENV}' is not active (current: ${ACTIVE_CONDA_ENV:-none})." >&2
+        echo "WARNING: continuing because ${RUN_AF3} was found at: ${RUN_AF3_PATH}" >&2
+    fi
+else
+    if [[ "${ACTIVE_CONDA_ENV}" == "${AF3_CONDA_ENV}" ]]; then
+        echo "ERROR: Conda environment '${AF3_CONDA_ENV}' is active, but ${RUN_AF3} could not be resolved as an executable." >&2
+        echo "The AlphaFold 3 installation in this environment may be incomplete." >&2
+    else
+        echo "ERROR: Conda environment '${AF3_CONDA_ENV}' is not active and ${RUN_AF3} could not be resolved as an executable." >&2
+        echo "Activate it with: conda activate ${AF3_CONDA_ENV}" >&2
+        echo "Alternatively, install AlphaFold 3 and expose ${RUN_AF3} through PATH or set RUN_AF3 explicitly." >&2
+    fi
     exit 1
 fi
 
-for bin in jackhmmer nhmmer hmmalign hmmsearch hmmbuild; do
-    if [[ ! -x "${HMMER3_BINDIR}/${bin}" ]]; then
-        echo "ERROR: could not find executable ${bin} in ${HMMER3_BINDIR}" >&2
+declare -A HMMER_BIN_PATHS=()
+HMMER_BINS=(jackhmmer nhmmer hmmalign hmmsearch hmmbuild)
+
+if [[ -n "${HMMER3_BINDIR}" ]]; then
+    if [[ ! -d "${HMMER3_BINDIR}" ]]; then
+        echo "ERROR: HMMER3_BINDIR does not exist: ${HMMER3_BINDIR}" >&2
+        exit 1
+    fi
+
+    for bin in "${HMMER_BINS[@]}"; do
+        HMMER_BIN_PATHS["${bin}"]="${HMMER3_BINDIR}/${bin}"
+    done
+elif [[ -n "${CONDA_PREFIX:-}" ]]; then
+    HMMER3_BINDIR="${CONDA_PREFIX}/bin"
+
+    for bin in "${HMMER_BINS[@]}"; do
+        HMMER_BIN_PATHS["${bin}"]="${HMMER3_BINDIR}/${bin}"
+    done
+else
+    for bin in "${HMMER_BINS[@]}"; do
+        resolved_bin="$(command -v "${bin}" 2>/dev/null || true)"
+
+        if [[ -z "${resolved_bin}" ]]; then
+            echo "ERROR: Conda environment '${AF3_CONDA_ENV}' is not active and ${bin} was not found in PATH." >&2
+            echo "Activate the environment, define HMMER3_BINDIR, or expose the HMMER executables through PATH." >&2
+            exit 1
+        fi
+
+        HMMER_BIN_PATHS["${bin}"]="${resolved_bin}"
+    done
+fi
+
+for bin in "${HMMER_BINS[@]}"; do
+    if [[ ! -x "${HMMER_BIN_PATHS[${bin}]}" ]]; then
+        echo "ERROR: could not find executable ${bin} at ${HMMER_BIN_PATHS[${bin}]}" >&2
+        if [[ -n "${CONDA_PREFIX:-}" && "${HMMER3_BINDIR}" == "${CONDA_PREFIX}/bin" ]]; then
+            echo "The active Conda environment may have an incomplete HMMER installation." >&2
+        else
+            echo "Define HMMER3_BINDIR or activate an environment containing all required HMMER executables." >&2
+        fi
         exit 1
     fi
 done
@@ -79,6 +129,9 @@ if [[ ! -d "${MODEL_DIR}" ]]; then
     echo "ERROR: MODEL_DIR does not exist: ${MODEL_DIR}" >&2
     exit 1
 fi
+
+mkdir -p "${CASE_DIR}"
+mkdir -p "${OUTPUT_DIR}"
 
 # GENERATE ALPHAFOLD 3 JSON INPUT
 python - <<PY
@@ -165,12 +218,12 @@ echo "JSON_FILE:  ${JSON_FILE}"
 echo "OUTPUT_DIR: ${OUTPUT_DIR}"
 echo "LOG_FILE:   ${LOG_FILE}"
 
-"${RUN_AF3}" \
-    --jackhmmer_binary_path="${HMMER3_BINDIR}/jackhmmer" \
-    --nhmmer_binary_path="${HMMER3_BINDIR}/nhmmer" \
-    --hmmalign_binary_path="${HMMER3_BINDIR}/hmmalign" \
-    --hmmsearch_binary_path="${HMMER3_BINDIR}/hmmsearch" \
-    --hmmbuild_binary_path="${HMMER3_BINDIR}/hmmbuild" \
+"${RUN_AF3_PATH}" \
+    --jackhmmer_binary_path="${HMMER_BIN_PATHS[jackhmmer]}" \
+    --nhmmer_binary_path="${HMMER_BIN_PATHS[nhmmer]}" \
+    --hmmalign_binary_path="${HMMER_BIN_PATHS[hmmalign]}" \
+    --hmmsearch_binary_path="${HMMER_BIN_PATHS[hmmsearch]}" \
+    --hmmbuild_binary_path="${HMMER_BIN_PATHS[hmmbuild]}" \
     --db_dir="${DB_DIR}" \
     --model_dir="${MODEL_DIR}" \
     --json_path="${JSON_FILE}" \

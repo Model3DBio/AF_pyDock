@@ -28,6 +28,8 @@ PDB_PATTERN="${PDB_PATTERN:-*_unrelaxed_*.pdb}"
 OVERWRITE="${OVERWRITE:-0}"
 
 # Relaxation command configuration.
+AF2_CONDA_ENV="${AF2_CONDA_ENV:-Alphafold2}"
+COLABFOLD_RELAX="${COLABFOLD_RELAX:-colabfold_relax}"
 GREASY="${GREASY:-/path/to/software/greasy/}"
 GREASY_NWORKERS="${GREASY_NWORKERS:-4}"
 RUN_GREASY="${RUN_GREASY:-1}"
@@ -81,8 +83,8 @@ for dir in "${input_dirs[@]}"; do
             continue
         fi
 
-        printf 'colabfold_relax --max-iterations 2000 --tolerance 2.39 --stiffness 10.0 --max-outer-iterations 3 --use-gpu "%s" "%s"\n' \
-            "${pdb_file}" "${relaxed_file}" >> "${JOB_FILE}"
+        printf '%q --max-iterations 2000 --tolerance 2.39 --stiffness 10.0 --max-outer-iterations 3 --use-gpu "%s" "%s"\n' \
+            "${COLABFOLD_RELAX}" "${pdb_file}" "${relaxed_file}" >> "${JOB_FILE}"
         job_count=$((job_count + 1))
     done < <(find "${dir}" -type f -name "${PDB_PATTERN}" -print0 | sort -z)
 done
@@ -101,9 +103,43 @@ if [[ "${job_count}" -eq 0 ]]; then
     exit 0
 fi
 
+ACTIVE_CONDA_ENV="${CONDA_DEFAULT_ENV:-}"
+
+if COLABFOLD_RELAX_PATH="$(command -v "${COLABFOLD_RELAX}" 2>/dev/null)"; then
+    if [[ "${ACTIVE_CONDA_ENV}" == "${AF2_CONDA_ENV}" ]]; then
+        echo "INFO: expected Conda environment is active: ${AF2_CONDA_ENV}"
+    else
+        echo "WARNING: Conda environment '${AF2_CONDA_ENV}' is not active (current: ${ACTIVE_CONDA_ENV:-none})." >&2
+        echo "WARNING: ${COLABFOLD_RELAX} is available at: ${COLABFOLD_RELAX_PATH}" >&2
+    fi
+else
+    if [[ "${RUN_GREASY}" == "1" ]]; then
+        if [[ "${ACTIVE_CONDA_ENV}" == "${AF2_CONDA_ENV}" ]]; then
+            echo "ERROR: Conda environment '${AF2_CONDA_ENV}' is active, but ${COLABFOLD_RELAX} could not be resolved as an executable." >&2
+            echo "The ColabFold installation in this environment may be incomplete." >&2
+        else
+            echo "ERROR: Conda environment '${AF2_CONDA_ENV}' is not active and ${COLABFOLD_RELAX} could not be resolved as an executable." >&2
+            echo "Activate it with: conda activate ${AF2_CONDA_ENV}" >&2
+            echo "Alternatively, install ColabFold and expose ${COLABFOLD_RELAX} through PATH or set COLABFOLD_RELAX explicitly." >&2
+        fi
+        exit 1
+    fi
+
+    echo "WARNING: ${COLABFOLD_RELAX} could not be resolved as an executable." >&2
+    echo "WARNING: the task file was created because RUN_GREASY=0, but it cannot be executed in the current environment." >&2
+fi
+
 if [[ "${RUN_GREASY}" == "1" ]]; then
+    GREASY_EXECUTABLE="${GREASY%/}/greasy"
+
+    if [[ ! -x "${GREASY_EXECUTABLE}" ]]; then
+        echo "ERROR: Greasy executable not found or not executable: ${GREASY_EXECUTABLE}" >&2
+        echo "Set GREASY to the directory containing the greasy executable." >&2
+        exit 1
+    fi
+
     export GREASY_NWORKERS
-    "${GREASY}/greasy" "${JOB_FILE}"
+    "${GREASY_EXECUTABLE}" "${JOB_FILE}"
 else
     echo "RUN_GREASY=0, not launching Greasy."
 fi
