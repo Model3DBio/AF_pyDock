@@ -11,7 +11,7 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 
 ENV_NAME="Alphafold2"
-CURRENT_PATH="$(pwd)"
+CURRENT_PATH="${CURRENT_PATH:-$(pwd)}"
 COLABFOLD_DIR="${CURRENT_PATH}/localcolabfold"
 LOCAL_CONDA_DIR="${COLABFOLD_DIR}/conda"
 
@@ -80,7 +80,7 @@ initialize_conda() {
 }
 
 if initialize_conda; then
-    CONDA_BASE="$(conda info --base)"
+    CONDA_BASE=`conda info --base`
     echo "Existing Conda installation detected:"
     echo "  ${CONDA_BASE}"
 else
