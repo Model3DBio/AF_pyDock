@@ -42,7 +42,7 @@ for h in "${model_dirs[@]}"; do
     shopt -s nullglob
     pdb_files=(
         "${h}"/*[0-9].pdb
-        "${h}"/[0-9]*_model.pdb
+        "${h}"/*_sample-[0-9]*_model.pdb
     )
     shopt -u nullglob
 
