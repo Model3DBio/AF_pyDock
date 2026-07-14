@@ -71,7 +71,7 @@ newmol = $LIG
 EOF
 
             printf 'cd "%s"; timeout 5m "%s/pyDock3" "%s" bindEy\n' \
-                "${h%/}" "${PYDOCK%/}" "${ini_file}" >> "${JOB_FILE}"
+                "${h%/}" "${PYDOCK%/}" "${ini_file/.ini}" >> "${JOB_FILE}"
         done
     done
 done
