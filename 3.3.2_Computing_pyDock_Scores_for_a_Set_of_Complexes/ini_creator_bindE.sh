@@ -7,8 +7,9 @@ CASE_STUDIES_DIR="${REPO_ROOT}/Case_Studies_Included"
 # Case ID
 export CASE="${CASE:-4POU}"
 export PYDOCK="${PYDOCK:-/usr/local/software/pyDock3/}"
-export GREASY="${GREASY:-/path/to/software/greasy/}"
-export GREASY_NWORKERS=${GREASY_NWORKERS:-8}
+export GREASY_HOME="${GREASY_HOME:-/path/to/software/GREASY_2.2}"
+export GREASY="${GREASY:-${GREASY_HOME%/}/bin}"
+export GREASY_NWORKERS="${GREASY_NWORKERS:-8}"
 export CHAINS_REC_LIG_VALUES=${CHAINS_REC_LIG_VALUES:-"A B"}
 
 CASE_DIR="${CASE_STUDIES_DIR}/${CASE}"
