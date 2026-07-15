@@ -38,6 +38,39 @@ if [[ ${#model_dirs[@]} -eq 0 ]]; then
     exit 1
 fi
 
+RECEPTOR_VALUES=()
+LIGAND_VALUES=()
+RECEPTOR_TAGS=()
+LIGAND_TAGS=()
+declare -A SEEN_CONFIGURATIONS=()
+
+for value in "${CHAINS_REC_LIG_VALUES[@]}"; do
+    read -r REC LIG extra <<< "${value}"
+
+    if [[ -z "${REC}" || -z "${LIG}" || -n "${extra}" ]]; then
+        echo "ERROR: invalid receptor/ligand definition: ${value}" >&2
+        echo 'Expected: "RECEPTOR_CHAINS LIGAND_CHAINS"' >&2
+        exit 1
+    fi
+
+    REC_TAG="${REC//,/-}"
+    LIG_TAG="${LIG//,/-}"
+    configuration_key="${REC_TAG}|${LIG_TAG}"
+
+    if [[ ${SEEN_CONFIGURATIONS["${configuration_key}"]+_} ]]; then
+        echo "ERROR: duplicate receptor/ligand configuration after filename normalization:" >&2
+        echo "  ${SEEN_CONFIGURATIONS["${configuration_key}"]}" >&2
+        echo "  ${value}" >&2
+        exit 1
+    fi
+
+    SEEN_CONFIGURATIONS["${configuration_key}"]="${value}"
+    RECEPTOR_VALUES+=("${REC}")
+    LIGAND_VALUES+=("${LIG}")
+    RECEPTOR_TAGS+=("${REC_TAG}")
+    LIGAND_TAGS+=("${LIG_TAG}")
+done
+
 : > "${JOB_FILE}"
 
 for h in "${model_dirs[@]}"; do
@@ -54,12 +87,13 @@ for h in "${model_dirs[@]}"; do
         j="$(basename "${pdb_file}")"
         echo "$j"
 
-        for value in "${CHAINS_REC_LIG_VALUES[@]}"; do
-            REC=$(echo "$value" | cut -d" " -f1)
-            LIG=$(echo "$value" | cut -d" " -f2)
-            CH=${LIG/,}
+        for config_index in "${!RECEPTOR_VALUES[@]}"; do
+            REC="${RECEPTOR_VALUES[${config_index}]}"
+            LIG="${LIGAND_VALUES[${config_index}]}"
+            REC_TAG="${RECEPTOR_TAGS[${config_index}]}"
+            LIG_TAG="${LIGAND_TAGS[${config_index}]}"
 
-            ini_file="${j/.pdb}_LIG_${CH}.ini"
+            ini_file="${j%.pdb}_LIG_${LIG_TAG}_REC_${REC_TAG}.ini"
             ini_path="${h}/${ini_file}"
 
             cat <<EOF > "${ini_path}"
