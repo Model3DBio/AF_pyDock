@@ -2,7 +2,7 @@
 
 This repository accompanies the chapter
 **“Modeling Protein–Protein Complexes by Combining pyDock and AlphaFold”**
-published in *Methods in Molecular Biology (2026)*, and provides a practical, reproducible implementation of the workflow described by **Rodríguez-Lumbreras et al.** .
+published in *Methods in Molecular Biology (2026)*, and provides a practical, reproducible implementation of the workflow described.
 
 The main goal is to demonstrate how **artificial intelligence–based modeling (AlphaFold2-Multimer and AlphaFold3)** can be combined with **energy-based scoring from pyDock** to improve the accuracy of protein–protein complex predictions, particularly for challenging cases such as:
 
