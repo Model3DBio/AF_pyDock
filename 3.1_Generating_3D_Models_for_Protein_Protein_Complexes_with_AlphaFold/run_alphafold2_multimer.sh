@@ -4,7 +4,7 @@ set -euo pipefail
 # REPOSITORY PATHS
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-CASE_STUDIES_DIR="${REPO_ROOT}/Case_Studies_Included"
+CASE_STUDIES_DIR="${REPO_ROOT}/4_Case_Studies"
 
 # SOFTWARE CHECKS
 AF2_CONDA_ENV="${AF2_CONDA_ENV:-Alphafold2}"

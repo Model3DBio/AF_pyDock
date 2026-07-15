@@ -22,7 +22,7 @@ export MODEL_SEEDS="${MODEL_SEEDS:-13441}"
 # SOFTWARE AND PATHS
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-CASE_STUDIES_DIR="${REPO_ROOT}/Case_Studies_Included"
+CASE_STUDIES_DIR="${REPO_ROOT}/4_Case_Studies"
 APPDIR="${APPDIR:-/home/user/Programs}"
 ALPHAFOLD3DIR="${ALPHAFOLD3DIR:-${APPDIR}/alphafold3}"
 CIF_TO_PDB="${CIF_TO_PDB:-${SCRIPT_DIR}/cif_to_pdb.py}"

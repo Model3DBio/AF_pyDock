@@ -24,10 +24,10 @@ AlphaFold**](https://doi.org/10.1007/978-1-0716-4828-5_15), published in
 For the local **AlphaFold 3 installation instructions**, refer to
 [AlphaFold3-Conda-Install](https://github.com/Model3DBio/AlphaFold3-Conda-Install).
 
-The repository is organized into eight main workflow folders. Their numbered
-names correspond directly to the section numbering and headings used in the
-*Methods in Molecular Biology* chapter, making it possible to map each folder
-to the relevant part of the published protocol:
+The repository is organized into eight main workflow folders plus a case-study
+directory. Their numbered names correspond directly to the section numbering
+and headings used in the *Methods in Molecular Biology* chapter, making it
+possible to map each folder to the relevant part of the published protocol:
 
 ---
 
@@ -69,10 +69,14 @@ to the relevant part of the published protocol:
 │     energy tables and extracted AF2/AF3 metadata. The notebook computes
 │     z-scores for both scoring functions, generates combined AF–pyDock
 │     rankings, and outputs the final prioritized model list.
+│
+└── 4_Case_Studies/
+      Compressed 2FJG and 4POU case-study datasets. Extracted AF2, AF3 and
+      analysis outputs remain local unless explicitly added to version control.
 ```
 
-Each section provides the relevant scripts or usage notes. Precomputed test cases
-are supplied separately under `Case_Studies_Included/`.
+Each workflow section provides the relevant scripts or usage notes. Precomputed
+test cases are supplied separately under `4_Case_Studies/`.
 
 ---
 

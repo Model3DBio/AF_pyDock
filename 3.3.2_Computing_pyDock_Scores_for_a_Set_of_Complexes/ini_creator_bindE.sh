@@ -2,7 +2,7 @@
 # Repository paths are derived from this script, not from the caller's cwd.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-CASE_STUDIES_DIR="${REPO_ROOT}/Case_Studies_Included"
+CASE_STUDIES_DIR="${REPO_ROOT}/4_Case_Studies"
 
 # Case ID
 export CASE="${CASE:-4POU}"
