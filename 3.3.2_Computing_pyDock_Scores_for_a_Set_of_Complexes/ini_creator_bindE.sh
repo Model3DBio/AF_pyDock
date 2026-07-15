@@ -11,17 +11,19 @@ export GREASY="${GREASY:-/path/to/software/greasy/}"
 export GREASY_NWORKERS=${GREASY_NWORKERS:-8}
 export CHAINS_REC_LIG_VALUES=${CHAINS_REC_LIG_VALUES:-"A B"}
 
-AF2_DIR="${CASE_STUDIES_DIR}/${CASE}/AF2"
-AF3_DIR="${CASE_STUDIES_DIR}/${CASE}/AF3"
+CASE_DIR="${CASE_STUDIES_DIR}/${CASE}"
+AF2_DIR="${CASE_DIR}/AF2"
+AF3_DIR="${CASE_DIR}/AF3"
 AF3_LOCAL_DIR="${AF3_DIR}/output/${CASE}"
-JOB_FILE="${AF2_DIR}/Greasy_BindE_mul_ligs.txt"
+JOB_FILE="${CASE_DIR}/Greasy_BindE_mul_ligs.txt"
 
-if [[ ! -d "${AF2_DIR}" ]]; then
-    echo "ERROR: AF2 directory does not exist: ${AF2_DIR}" >&2
+if [[ ! -d "${AF2_DIR}" && ! -d "${AF3_DIR}" ]]; then
+    echo "ERROR: neither AF2 nor AF3 directory exists for case ${CASE}." >&2
+    echo "Expected at least one of:" >&2
+    echo "  ${AF2_DIR}" >&2
+    echo "  ${AF3_DIR}" >&2
     exit 1
 fi
-
-: > "${JOB_FILE}"
 
 shopt -s nullglob
 model_dirs=(
@@ -35,6 +37,8 @@ if [[ ${#model_dirs[@]} -eq 0 ]]; then
     echo "ERROR: no AF2 or AF3 model directories found for case ${CASE}." >&2
     exit 1
 fi
+
+: > "${JOB_FILE}"
 
 for h in "${model_dirs[@]}"; do
     echo "${h}"
