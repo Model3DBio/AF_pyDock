@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # REPOSITORY PATHS
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -8,6 +9,34 @@ CASE_STUDIES_DIR="${REPO_ROOT}/Case_Studies_Included"
 # SOFTWARE CHECKS
 AF2_CONDA_ENV="${AF2_CONDA_ENV:-Alphafold2}"
 COLABFOLD_BATCH="${COLABFOLD_BATCH:-colabfold_batch}"
+AF2_MULTIMER_VERSIONS="${AF2_MULTIMER_VERSIONS-v2 v3}"
+
+AF2_VERSION_LIST=()
+read -r -a AF2_VERSION_LIST <<< "${AF2_MULTIMER_VERSIONS}" || true
+
+if [[ ${#AF2_VERSION_LIST[@]} -eq 0 ]]; then
+    echo "ERROR: AF2_MULTIMER_VERSIONS must contain at least one version." >&2
+    exit 1
+fi
+
+SEEN_AF2_VERSIONS=""
+for version in "${AF2_VERSION_LIST[@]}"; do
+    case "${version}" in
+        v1|v2|v3)
+            ;;
+        *)
+            echo "ERROR: unsupported AlphaFold2-Multimer version: ${version}" >&2
+            echo 'Set AF2_MULTIMER_VERSIONS to a space-separated selection of: v1 v2 v3' >&2
+            exit 1
+            ;;
+    esac
+
+    if [[ " ${SEEN_AF2_VERSIONS} " == *" ${version} "* ]]; then
+        echo "ERROR: duplicate AlphaFold2-Multimer version: ${version}" >&2
+        exit 1
+    fi
+    SEEN_AF2_VERSIONS+=" ${version}"
+done
 
 ACTIVE_CONDA_ENV="${CONDA_DEFAULT_ENV:-}"
 
@@ -52,7 +81,8 @@ mkdir -p "${CASE_DIR}"
 } > "${FASTA_FILE}"
 
 # Run AF2-Multimer
-for h in v1 v2 v3; do
+echo "INFO: AlphaFold2-Multimer versions: ${AF2_VERSION_LIST[*]}"
+for h in "${AF2_VERSION_LIST[@]}"; do
     "${COLABFOLD_BATCH_PATH}" "${FASTA_FILE}" "${FASTA_FILE%.fasta}.colabfold.${h}" \
         --save-recycles \
         --model-type "alphafold2_multimer_${h}" \

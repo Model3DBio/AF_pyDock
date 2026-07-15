@@ -26,12 +26,42 @@ fi
 # By default, relax unrelaxed AF2 PDB files and skip outputs that already exist.
 PDB_PATTERN="${PDB_PATTERN:-*_unrelaxed_*.pdb}"
 OVERWRITE="${OVERWRITE:-0}"
+AF2_RELAX_VERSIONS="${AF2_RELAX_VERSIONS-v2 v3}"
+
+AF2_RELAX_VERSION_LIST=()
+read -r -a AF2_RELAX_VERSION_LIST <<< "${AF2_RELAX_VERSIONS}" || true
+
+if [[ ${#AF2_RELAX_VERSION_LIST[@]} -eq 0 ]]; then
+    echo "ERROR: AF2_RELAX_VERSIONS must contain at least one version." >&2
+    exit 1
+fi
+
+SEEN_AF2_RELAX_VERSIONS=""
+for version in "${AF2_RELAX_VERSION_LIST[@]}"; do
+    case "${version}" in
+        v1|v2|v3)
+            ;;
+        *)
+            echo "ERROR: unsupported AlphaFold2-Multimer relaxation version: ${version}" >&2
+            echo 'Set AF2_RELAX_VERSIONS to a space-separated selection of: v1 v2 v3' >&2
+            exit 1
+            ;;
+    esac
+
+    if [[ " ${SEEN_AF2_RELAX_VERSIONS} " == *" ${version} "* ]]; then
+        echo "ERROR: duplicate AlphaFold2-Multimer relaxation version: ${version}" >&2
+        exit 1
+    fi
+    SEEN_AF2_RELAX_VERSIONS+=" ${version}"
+done
 
 # Relaxation command configuration.
 AF2_CONDA_ENV="${AF2_CONDA_ENV:-Alphafold2}"
 COLABFOLD_RELAX="${COLABFOLD_RELAX:-colabfold_relax}"
-GREASY="${GREASY:-/path/to/software/greasy/}"
+GREASY_HOME="${GREASY_HOME:-/path/to/software/GREASY_2.2}"
+GREASY="${GREASY:-${GREASY_HOME%/}/bin}"
 GREASY_NWORKERS="${GREASY_NWORKERS:-4}"
+RELAX_TIMEOUT="${RELAX_TIMEOUT:-8m}"
 RUN_GREASY="${RUN_GREASY:-1}"
 JOB_FILE="${JOB_FILE:-${SCRIPT_DIR}/${CASE:-case_studies}.af2_relax.greasy}"
 
@@ -60,6 +90,7 @@ fi
 : > "${JOB_FILE}"
 job_count=0
 skipped_count=0
+version_skipped_count=0
 valid_dir_count=0
 
 for dir in "${input_dirs[@]}"; do
@@ -71,6 +102,18 @@ for dir in "${input_dirs[@]}"; do
     valid_dir_count=$((valid_dir_count + 1))
 
     while IFS= read -r -d '' pdb_file; do
+        model_version=""
+        case "${pdb_file}" in
+            *.colabfold.v1/*) model_version="v1" ;;
+            *.colabfold.v2/*) model_version="v2" ;;
+            *.colabfold.v3/*) model_version="v3" ;;
+        esac
+
+        if [[ -n "${model_version}" && " ${AF2_RELAX_VERSION_LIST[*]} " != *" ${model_version} "* ]]; then
+            version_skipped_count=$((version_skipped_count + 1))
+            continue
+        fi
+
         relaxed_file="${pdb_file/_unrelaxed_/_relaxed_}"
 
         if [[ "${relaxed_file}" == "${pdb_file}" ]]; then
@@ -83,8 +126,8 @@ for dir in "${input_dirs[@]}"; do
             continue
         fi
 
-        printf '%q --max-iterations 2000 --tolerance 2.39 --stiffness 10.0 --max-outer-iterations 3 --use-gpu "%s" "%s"\n' \
-            "${COLABFOLD_RELAX}" "${pdb_file}" "${relaxed_file}" >> "${JOB_FILE}"
+        printf 'timeout %q %q --max-iterations 2000 --tolerance 2.39 --stiffness 10.0 --max-outer-iterations 3 --use-gpu "%s" "%s"\n' \
+            "${RELAX_TIMEOUT}" "${COLABFOLD_RELAX}" "${pdb_file}" "${relaxed_file}" >> "${JOB_FILE}"
         job_count=$((job_count + 1))
     done < <(find "${dir}" -type f -name "${PDB_PATTERN}" -print0 | sort -z)
 done
@@ -96,6 +139,7 @@ fi
 
 echo "Relaxation jobs written to: ${JOB_FILE}"
 echo "Jobs: ${job_count}"
+echo "Skipped models from unselected AF2 versions: ${version_skipped_count}"
 echo "Skipped existing or unmatched files: ${skipped_count}"
 
 if [[ "${job_count}" -eq 0 ]]; then

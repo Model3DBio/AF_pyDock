@@ -152,7 +152,8 @@ repository-specific task files, attribution and license information.
 
 This folder contains:
 
-* Workflows for **AlphaFold2-Multimer** (versions v1, v2, v3) with:
+* Workflows for configurable **AlphaFold2-Multimer** versions, using v2 and v3
+  by default while retaining v1 for legacy reproducibility, with:
 
   * increased recycles
   * dropout during inference
