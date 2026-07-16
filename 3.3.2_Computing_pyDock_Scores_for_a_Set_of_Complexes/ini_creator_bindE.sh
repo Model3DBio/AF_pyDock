@@ -11,6 +11,7 @@ export GREASY_HOME="${GREASY_HOME:-/path/to/software/GREASY_2.2}"
 export GREASY="${GREASY:-${GREASY_HOME%/}/bin}"
 export GREASY_NWORKERS="${GREASY_NWORKERS:-8}"
 export CHAINS_REC_LIG_VALUES=${CHAINS_REC_LIG_VALUES:-"A B"}
+CIF_TO_PDB="${CIF_TO_PDB:-${REPO_ROOT}/3.1_Generating_3D_Models_for_Protein_Protein_Complexes_with_AlphaFold/cif_to_pdb.py}"
 
 CASE_DIR="${CASE_STUDIES_DIR}/${CASE}"
 AF2_DIR="${CASE_DIR}/AF2"
@@ -25,6 +26,20 @@ if [[ ! -d "${AF2_DIR}" && ! -d "${AF3_DIR}" ]]; then
     echo "  ${AF3_DIR}" >&2
     exit 1
 fi
+
+# AlphaFold Server models are CIF files directly below AF3/fold*/.
+for cif_file in "${AF3_DIR}"/fold*/*_model_*.cif; do
+    [[ -f "${cif_file}" && "${cif_file}" =~ _model_[0-9]+\.cif$ ]] || continue
+    pdb_file="${cif_file%.cif}.pdb"
+    [[ -s "${pdb_file}" ]] && continue
+
+    echo "Converting AlphaFold Server model: ${cif_file}"
+    if ! "${CIF_TO_PDB}" "${cif_file}" "${pdb_file}" || [[ ! -s "${pdb_file}" ]]; then
+        echo "ERROR: CIF-to-PDB conversion failed: ${cif_file}" >&2
+        rm -f -- "${pdb_file}"
+        exit 1
+    fi
+done
 
 shopt -s nullglob
 model_dirs=(
