@@ -1,4 +1,4 @@
-# Integrating AlphaFold and pyDock for Protein–Protein Complex Modeling (Refactor Ongoing)
+# Integrating AlphaFold and pyDock for Protein–Protein Complex Modeling (Refactor Ongoing 80%)
 
 This repository accompanies the chapter
 **“Modeling Protein–Protein Complexes by Combining pyDock and AlphaFold”**
