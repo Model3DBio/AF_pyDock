@@ -34,6 +34,9 @@ possible to map each folder to the relevant part of the published protocol:
 ## 📁 Repository Structure
 
 ```
+├── environment.yml
+│     Lightweight Conda environment for the Python helper and analysis notebook.
+│
 ├── 2.2.3_ColabFold_on_a_Local_Machine_with_LocalColabFold/
 │     Adapted LocalColabFold installer, requirements, activation notes,
 │     troubleshooting and upstream attribution.
@@ -77,6 +80,46 @@ possible to map each folder to the relevant part of the published protocol:
 
 Each workflow section provides the relevant scripts or usage notes. Precomputed
 test cases are supplied separately under `4_Case_Studies/`.
+
+---
+
+## Lightweight Python environment
+
+The root `environment.yml` installs only the Python dependencies needed by
+`cif_to_pdb.py` and `Analysis_protocol.ipynb`. It does not install AlphaFold2,
+AlphaFold3, pyDock, SCWRL or Greasy; those programs retain their own installation
+procedures. Consequently, users preparing AF3 Server files or analysing
+supported AF3 and supplied case-study outputs do not need to install
+AlphaFold2 merely to use the Python tools.
+
+The default creates an independent environment:
+
+```bash
+conda env create --file environment.yml
+conda activate af-pydock-analysis
+```
+
+The environment name and dependency constraints are visible and editable in
+the YAML. A different name can also be selected without editing it:
+
+```bash
+conda env create --name my-analysis-env --file environment.yml
+```
+
+Users who deliberately prefer an existing environment can apply the same YAML
+to it. Before doing so, review the `python=` constraint in `environment.yml`
+and adjust it if the existing software requires another compatible Python
+version. For example:
+
+```bash
+conda env update --name Alphafold3 --file environment.yml
+```
+
+The command-line name overrides the default name in the YAML. Do not add
+`--prune`: packages specific to the existing environment are not listed in
+this repository file. Updating an existing scientific environment may change
+its dependency resolution, so the independent environment remains the safer
+default. See the section 3.4 README for kernel selection and execution.
 
 ---
 
@@ -251,7 +294,7 @@ without recalculating the most computationally expensive step.
 
 ## 🛠 Requirements
 
-* Python ≥ 3.8
+* Python 3.12 by default for the lightweight helper and notebook environment
 * GNU Bash and `wget` for the optional ColabFold installer
 * [pyDock3](2.3_pyDock_Scoring/2.3_README.md), requested and installed separately
 * [SCWRL3](2.4_SCWRL/2.4_README.md), when pyDock3 needs to rebuild incomplete side chains

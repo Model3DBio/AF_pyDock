@@ -1,0 +1,17 @@
+# Lightweight environment for the repository Python helpers and notebook.
+# Change this name, or override it with the command-line --name option, to target another
+# environment. AlphaFold, pyDock, SCWRL and Greasy are installed separately.
+name: af-pydock-analysis
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - python=3.12
+  - "biopython>=1.84,<2"
+  - "numpy>=1.26,<3"
+  - "pandas>=2.2,<3"
+  - "matplotlib-base>=3.8,<4"
+  - "ipykernel>=6,<8"
+  - "notebook>=7,<8"
