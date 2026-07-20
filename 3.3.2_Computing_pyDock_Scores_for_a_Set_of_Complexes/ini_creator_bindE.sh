@@ -7,6 +7,7 @@ CASE_STUDIES_DIR="${REPO_ROOT}/4_Case_Studies"
 # Case ID
 export CASE="${CASE:-4POU}"
 export PYDOCK="${PYDOCK:-/usr/local/software/pyDock3/}"
+export PYDOCK_BINARY="${PYDOCK_BINARY:-pyDock3}"
 export GREASY_HOME="${GREASY_HOME:-/path/to/software/GREASY_2.2}"
 export GREASY="${GREASY:-${GREASY_HOME%/}/bin}"
 export GREASY_NWORKERS="${GREASY_NWORKERS:-8}"
@@ -124,8 +125,9 @@ mol = $LIG
 newmol = $LIG
 EOF
 
-            printf 'cd "%s"; timeout 5m "%s/pyDock3" "%s" bindEy\n' \
-                "${h%/}" "${PYDOCK%/}" "${ini_file/.ini}" >> "${JOB_FILE}"
+            printf 'cd "%s"; timeout 5m "%s/%s" "%s" bindEy\n' \
+                "${h%/}" "${PYDOCK%/}" "${PYDOCK_BINARY}" \
+                "${ini_file/.ini}" >> "${JOB_FILE}"
         done
     done
 done
