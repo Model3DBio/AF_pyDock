@@ -6,7 +6,7 @@ AlphaFold**](https://doi.org/10.1007/978-1-0716-4828-5_15)
 published in *Methods in Molecular Biology (2026)*, and provides a practical, reproducible implementation of the workflow described.
 
 > [!WARNING]
-> **Development status — refactoring in progress (approximately 85% complete).**
+> **Development status — refactoring in progress (approximately 90% complete).**
 > The main workflow is available, but some scripts and documentation are still
 > being reviewed and harmonized. Test each stage with a small model set and
 > inspect the generated files before starting production calculations.
