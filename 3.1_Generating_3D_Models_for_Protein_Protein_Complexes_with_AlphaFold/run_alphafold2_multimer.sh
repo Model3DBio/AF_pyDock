@@ -89,5 +89,7 @@ for h in "${AF2_VERSION_LIST[@]}"; do
         --recycle-early-stop-tolerance 0 \
         --rank multimer \
         --use-dropout \
-        --num-recycle 20
+        --num-recycle 20 \
+        --amber \
+        --use-gpu-relax
 done
