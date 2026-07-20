@@ -1,9 +1,15 @@
-# Integrating AlphaFold and pyDock for Protein–Protein Complex Modeling (Refactor Ongoing 85%)
+# Integrating AlphaFold and pyDock for Protein–Protein Complex Modeling
 
 This repository accompanies the chapter
 [**Modeling Protein–Protein Complexes by Combining pyDock and
 AlphaFold**](https://doi.org/10.1007/978-1-0716-4828-5_15)
 published in *Methods in Molecular Biology (2026)*, and provides a practical, reproducible implementation of the workflow described.
+
+> [!WARNING]
+> **Development status — refactoring in progress (approximately 85% complete).**
+> The main workflow is available, but some scripts and documentation are still
+> being reviewed and harmonized. Test each stage with a small model set and
+> inspect the generated files before starting production calculations.
 
 The main goal is to demonstrate how **artificial intelligence–based modeling (AlphaFold2-Multimer and AlphaFold3)** can be combined with **energy-based scoring from pyDock** to improve the accuracy of protein–protein complex predictions, particularly for challenging cases such as:
 
@@ -34,7 +40,7 @@ possible to map each folder to the relevant part of the published protocol:
 
 ## 📁 Repository Structure
 
-```
+<pre><code>
 ├── environment.yml
 │     Lightweight Conda environment for the Python helper and analysis notebook.
 │
@@ -64,23 +70,29 @@ possible to map each folder to the relevant part of the published protocol:
 │     AlphaFold2 PDB models before pyDock scoring.
 │
 ├── 3.3.2_Computing_pyDock_Scores_for_a_Set_of_Complexes/
-│     Template (`.ini`) generation, `bindEy` execution, pyDock3-controlled
+│     Template (<i>.ini</i>) generation, <i>bindEy</i> execution, pyDock3-controlled
 │     side-chain reconstruction with SCWRL3, and pyDock energy tables.
 │
 ├── 3.4_Combined_Model_Confidence_and_pyDock_Score/
-│     Jupyter Notebook (`Analysis_protocol.ipynb`) for integrating AlphaFold
+│     Jupyter Notebook <i>Analysis_protocol.ipynb</i> for integrating AlphaFold
 │     confidence metrics (AF-MC) with pyDock energy scores, including parsed
 │     energy tables and extracted AF2/AF3 metadata. The notebook computes
 │     z-scores for both scoring functions, generates combined AF–pyDock
 │     rankings, and outputs the final prioritized model list.
 │
 └── 4_Case_Studies/
-      Compressed 2FJG and 4POU case-study datasets. Extracted AF2, AF3 and
-      analysis outputs remain local unless explicitly added to version control.
-```
+    ├── 2FJG/
+    │   └── 2FJG.tar.gz
+    └── 4POU/
+        └── 4POU.tar.gz
+</code></pre>
 
-Each workflow section provides the relevant scripts or usage notes. Precomputed
-test cases are supplied separately under `4_Case_Studies/`.
+Each workflow section provides the relevant scripts or usage notes. The two
+case-study archives contain precomputed AlphaFold2-Multimer and local
+AlphaFold3 model-generation outputs. Extract the selected archive inside its
+case directory before running the downstream pyDock scoring and combined
+analysis workflows. pyDock `.ene` files and `Analysis/` results are generated
+locally and are not included in the archives.
 
 ---
 
@@ -206,12 +218,13 @@ This folder contains:
   * increased recycles
   * dropout during inference
   * saving all intermediate recycles
-  * multiple seeds
-* Optional relaxation of unrelaxed AlphaFold2 PDB models with `colabfold_relax`.
+  * GPU Amber relaxation of the final ranked models
+* Optional post-processing of saved AlphaFold2 recycle PDB models with
+  `colabfold_relax` when a complete relaxed recycle ensemble is required.
 * Scripts using a local ColabFold installation for rapid predictions without
   downloading the full AlphaFold database set.
 * AlphaFold3 examples (server-based and local execution), including CIF-to-PDB conversion.
-* FASTA templates for heterodimers and homooligomers.
+* Configurable sequence inputs for heterodimers and other multichain complexes.
 
 The main helper scripts are `run_alphafold2_multimer.sh`,
 `relax_alphafold2_models.sh`, `run_alphafold3.sh`, and `cif_to_pdb.py`.
@@ -242,7 +255,9 @@ The **VHH–RNase A (PDB 4POU)** complex is provided as an illustrative example.
 
 ## 🔗 3.4. Integrating AlphaFold Confidence and pyDock Energies
 
-**combining AlphaFold model confidence (AF-MC = 0.8·ipTM + 0.2·pTM) with pyDock energies using z-score normalization.**
+This section combines AlphaFold model confidence
+(`AF-MC = 0.8·ipTM + 0.2·pTM`) with pyDock energies using z-score
+normalization to prioritize the most promising complex models.
 
 Included:
 
@@ -261,19 +276,22 @@ Included:
   * `Z_AF/pyDock-1VDW = Z_AF-MC – Z_pyDock-1VDW`
 * Final ranking and filtering of top predictions.
 
-When **AF-MC < 0.8**, the pipeline automatically falls back to **classical pyDock docking**, following the decision tree shown in Fig. 1 of the chapter.
+When **AF-MC < 0.8**, the protocol recommends complementing AlphaFold
+predictions with **classical pyDock docking**, following the decision tree
+shown in Fig. 1 of the chapter.
 <p align="center">
   <img src="Fig.1_Scheme.png" alt="Fig.1_Scheme.png" width="600"/>
 </p>
 
-In this repository, **only the components highlighted in the red box of the figure are implemented**, namely:
+This repository supports the part of the protocol highlighted in the red box:
 
 * Generation of AlphaFold2-Multimer models using **ColabFold** (optional use AlphaFold3 server)
 * Extraction of **ipTM** and **pTM**
 * Computation of **Model Confidence (AF-MC)**
 * Calculation of **pyDock energy scoring** for AF2/AF3-generated complexes
 
-The remaining module—**the docking stage starting from monomeric or unbound structures**—is **not included** here.
+The **docking stage starting from monomeric or unbound structures** is outside
+the scope of this repository.
 If docking poses are needed, they can be generated via the **pyDockWEB server**:
 
 👉 [https://life.bsc.es/pid/pydockweb](https://life.bsc.es/pid/pydockweb)
@@ -326,6 +344,13 @@ For software setup and workflow requirements, start with:
   bundled with pyDock3;
 * [`2.5_README.md`](2.5_Greasy/2.5_README.md) for Greasy installation and
   integration with the parallel repository workflows.
+* [`3.1_README.md`](3.1_Generating_3D_Models_for_Protein_Protein_Complexes_with_AlphaFold/3.1_README.md)
+  for generating and preparing AF2 and AF3 models;
+* [`3.3.2_README.md`](3.3.2_Computing_pyDock_Scores_for_a_Set_of_Complexes/3.3.2_README.md)
+  for generating pyDock configurations and energy tables for a set of models;
+* [`3.4_README.md`](3.4_Combined_Model_Confidence_and_pyDock_Score/3.4_README.md)
+  for combining AlphaFold confidence with pyDock energies in the analysis
+  notebook.
 
 ---
 
