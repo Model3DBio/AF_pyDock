@@ -6,7 +6,7 @@ AlphaFold**](https://doi.org/10.1007/978-1-0716-4828-5_15)
 published in *Methods in Molecular Biology (2026)*, and provides a practical, reproducible implementation of the workflow described.
 
 > [!WARNING]
-> **Development status — refactoring in progress (approximately 90% complete).**
+> **Development status — refactoring in progress (approximately 95% complete).**
 > The main workflow is available, but some scripts and documentation are still
 > being reviewed and harmonized. Test each stage with a small model set and
 > inspect the generated files before starting production calculations.
@@ -71,7 +71,8 @@ possible to map each folder to the relevant part of the published protocol:
 │
 ├── 3.3.2_Computing_pyDock_Scores_for_a_Set_of_Complexes/
 │     Template (<i>.ini</i>) generation, <i>bindEy</i> execution, pyDock3-controlled
-│     side-chain reconstruction with SCWRL3, and pyDock energy tables.
+│     side-chain reconstruction with SCWRL3, pyDock energy tables, and optional
+│     reference-based <i>capriRMSD</i> assessment.
 │
 ├── 3.4_Combined_Model_Confidence_and_pyDock_Score/
 │     Jupyter Notebook <i>Analysis_protocol.ipynb</i> for integrating AlphaFold
@@ -171,9 +172,10 @@ workflow routes, parameter access and license distinctions.
 [pyDock](https://life.bsc.es/pid/pydock/) is developed by the Protein
 Interactions and Docking Group at the Barcelona Supercomputing Center. The
 complete package supports protein–protein docking, but this repository uses
-pyDock3 only to score existing AlphaFold complex models through its `bindEy`
-module. The software must be requested separately and is not redistributed
-with this repository.
+pyDock primarily to score existing AlphaFold complex models through `bindEy`.
+When an experimental complex is available, an optional `capriRMSD` step can
+assess the predicted interfaces. The software must be requested separately and
+is not redistributed with this repository.
 
 See [`2.3_README.md`](2.3_pyDock_Scoring/2.3_README.md) for access and license
 information, 32-bit compatibility requirements, `PYDOCK` configuration,
@@ -200,7 +202,8 @@ procedure, configuration, compatibility notes and upstream attribution.
 [Greasy](https://github.com/BSC-Support-Team/GREASY), developed by the HPC User
 Support Team at the Barcelona Supercomputing Center, executes independent
 commands concurrently from a text task file. This repository uses it for
-optional AlphaFold2 relaxation and parallel pyDock `bindEy` calculations.
+optional AlphaFold2 relaxation and parallel pyDock scoring, including the
+optional `bindEy`–`capriRMSD` sequence.
 
 See [`2.5_README.md`](2.5_Greasy/2.5_README.md) for the chapter-compatible
 `GREASY_2.2` installation layout, environment variables, verification,
@@ -239,6 +242,8 @@ This folder includes:
 
 * Automatic generation of all required `*.ini` files.
 * Parallel execution of **bindEy** via **Greasy**.
+* Optional reference-based **capriRMSD** assessment when an experimental
+  complex and its chain correspondence are provided.
 * Reconstruction of incomplete side chains by pyDock3 using its configured
   **SCWRL3** executable when required.
 * Example `*.ene` energy tables including:
