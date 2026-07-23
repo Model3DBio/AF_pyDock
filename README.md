@@ -79,7 +79,9 @@ possible to map each folder to the relevant part of the published protocol:
 │     confidence metrics (AF-MC) with pyDock energy scores, including parsed
 │     energy tables and extracted AF2/AF3 metadata. The notebook computes
 │     z-scores for both scoring functions, generates combined AF–pyDock
-│     rankings, and outputs the final prioritized model list.
+│     rankings, provides an interactive chain-coloured 3D viewer with an
+│     optional receptor-aligned reference overlay, and outputs the final
+│     prioritized model list.
 │
 └── 4_Case_Studies/
     ├── 2FJG/
